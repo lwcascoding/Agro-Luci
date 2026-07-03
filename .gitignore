@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+agro_nossos_bichos.db
+static/uploads/produtos/*
+!static/uploads/produtos/.gitkeep

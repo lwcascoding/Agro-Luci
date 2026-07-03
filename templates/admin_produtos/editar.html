@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Editar produto</title>
+  </head>
+  <body>
+    <h1>Editar produto</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('admin_produtos.editar_produto', produto_id=produto.id) }}" method="post" enctype="multipart/form-data">
+      <p>
+        <label for="nome">Nome</label><br>
+        <input id="nome" name="nome" value="{{ produto.nome }}" required>
+      </p>
+      <p>
+        <label for="preco">Preço</label><br>
+        <input id="preco" name="preco" value="{{ "%.2f"|format(produto.preco) }}" required inputmode="decimal">
+      </p>
+      <p>
+        <label for="foto">Nova foto</label><br>
+        <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+      </p>
+      {% if produto.foto %}
+        <p>
+          <img src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}" width="120">
+        </p>
+      {% endif %}
+      <button type="submit">Salvar</button>
+      <a href="{{ url_for('admin_produtos.listar_produtos') }}">Voltar</a>
+    </form>
+  </body>
+</html>

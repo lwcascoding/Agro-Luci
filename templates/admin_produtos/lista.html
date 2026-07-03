@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Admin - Produtos</title>
+  </head>
+  <body>
+    <h1>Produtos</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Cadastrar produto</h2>
+    <form action="{{ url_for('admin_produtos.cadastrar_produto') }}" method="post" enctype="multipart/form-data">
+      <p>
+        <label for="nome">Nome</label><br>
+        <input id="nome" name="nome" required>
+      </p>
+      <p>
+        <label for="preco">Preço</label><br>
+        <input id="preco" name="preco" required inputmode="decimal">
+      </p>
+      <p>
+        <label for="foto">Foto</label><br>
+        <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+      </p>
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Produtos cadastrados</h2>
+    {% if produtos %}
+      <table border="1" cellpadding="6">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Foto</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for produto in produtos %}
+            <tr>
+              <td>{{ produto.id }}</td>
+              <td>{{ produto.nome }}</td>
+              <td>{{ "%.2f"|format(produto.preco) }}</td>
+              <td>
+                {% if produto.foto %}
+                  <img src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}" width="80">
+                {% endif %}
+              </td>
+              <td>
+                <a href="{{ url_for('admin_produtos.editar_produto_form', produto_id=produto.id) }}">Editar</a>
+                <form action="{{ url_for('admin_produtos.excluir_produto', produto_id=produto.id) }}" method="post" style="display:inline">
+                  <button type="submit">Excluir</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Nenhum produto cadastrado.</p>
+    {% endif %}
+  </body>
+</html>
