@@ -2,41 +2,296 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Editar produto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --blue: #1f6feb;
+        --blue-dark: #154a9a;
+        --yellow: #ffd54a;
+        --yellow-soft: #fff6bf;
+        --page: #f3f7ff;
+        --text: #1b1b1b;
+        --muted: #667085;
+        --line: #dbe4f0;
+        --card: #ffffff;
+        --shadow: 0 14px 34px rgba(21, 74, 154, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: Inter, sans-serif;
+        background: var(--page);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .topbar {
+        background: rgba(255, 255, 255, 0.96);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 8px 22px rgba(21, 74, 154, 0.04);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: min(1180px, calc(100% - 32px));
+        min-height: 74px;
+        margin: 0 auto;
+      }
+
+      .brand img {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 8px 18px rgba(21, 74, 154, 0.12);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #596579;
+        font-weight: 600;
+      }
+
+      .nav a {
+        padding: 10px 14px;
+        border-radius: 8px;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        color: var(--blue-dark);
+        background: var(--yellow-soft);
+      }
+
+      .shell {
+        width: min(880px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 58px 0 72px;
+      }
+
+      .page-header {
+        margin-bottom: 30px;
+      }
+
+      .page-header h1 {
+        margin: 0 0 10px;
+        color: #102033;
+        font-size: clamp(2rem, 4vw, 2.7rem);
+      }
+
+      .page-header p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .dashboard-card {
+        border: 1px solid var(--line);
+        border-top: 6px solid var(--yellow);
+        border-radius: 12px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .form-card {
+        padding: 28px;
+      }
+
+      .flash-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 24px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .flash-list li {
+        padding: 14px 16px;
+        border: 1px solid #b8d4ff;
+        border-radius: 12px;
+        color: var(--blue-dark);
+        background: #eaf3ff;
+        font-weight: 700;
+      }
+
+      .product-form {
+        display: grid;
+        gap: 20px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      label {
+        color: #263142;
+        font-size: 0.94rem;
+        font-weight: 800;
+      }
+
+      input {
+        width: 100%;
+        min-height: 48px;
+        padding: 0 14px;
+        border: 1px solid #cfd8e6;
+        border-radius: 10px;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      input[type="file"] {
+        padding: 12px 14px;
+      }
+
+      input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+      }
+
+      .current-photo {
+        display: inline-flex;
+        width: 140px;
+        height: 140px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .current-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .primary-button,
+      .secondary-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 22px;
+        border-radius: 8px;
+        font-weight: 800;
+      }
+
+      .primary-button {
+        border: 0;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 12px 22px rgba(31, 111, 235, 0.24);
+        cursor: pointer;
+      }
+
+      .secondary-button {
+        color: var(--blue-dark);
+        background: var(--yellow-soft);
+        border: 1px solid #e5cf68;
+      }
+
+      @media (max-width: 720px) {
+        .topbar-inner {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 12px 0;
+        }
+
+        .nav {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Editar produto</h1>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="{{ url_for('admin_produtos.listar_produtos') }}" aria-label="AgroNotify dashboard">
+          <img src="{{ url_for('assets', filename='logo-agropecuaria-nossos-bichos.jpg') }}" alt="Agropecuária nossos bichos">
+        </a>
+        <nav class="nav" aria-label="Navegação do painel">
+          <a href="{{ url_for('admin_produtos.listar_produtos') }}">Dashboard</a>
+          <a href="{{ url_for('admin_produtos.listar_produtos') }}#produtos-tabela">Produtos</a>
+          <a href="{{ url_for('admin_produtos.listar_produtos') }}#novo-produto">Novo Produto</a>
+          <a href="/">Sair</a>
+        </nav>
+      </div>
+    </header>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <main class="shell">
+      <section class="page-header">
+        <h1>Editar produto</h1>
+        <p>Atualize as informações do produto selecionado.</p>
+      </section>
 
-    <form action="{{ url_for('admin_produtos.editar_produto', produto_id=produto.id) }}" method="post" enctype="multipart/form-data">
-      <p>
-        <label for="nome">Nome</label><br>
-        <input id="nome" name="nome" value="{{ produto.nome }}" required>
-      </p>
-      <p>
-        <label for="preco">Preço</label><br>
-        <input id="preco" name="preco" value="{{ "%.2f"|format(produto.preco) }}" required inputmode="decimal">
-      </p>
-      <p>
-        <label for="foto">Nova foto</label><br>
-        <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
-      </p>
-      {% if produto.foto %}
-        <p>
-          <img src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}" width="120">
-        </p>
-      {% endif %}
-      <button type="submit">Salvar</button>
-      <a href="{{ url_for('admin_produtos.listar_produtos') }}">Voltar</a>
-    </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-list">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      <section class="dashboard-card form-card">
+        <form class="product-form" action="{{ url_for('admin_produtos.editar_produto', produto_id=produto.id) }}" method="post" enctype="multipart/form-data">
+          <div class="field">
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" value="{{ produto.nome }}" required>
+          </div>
+          <div class="field">
+            <label for="preco">Preço</label>
+            <input id="preco" name="preco" value="{{ "%.2f"|format(produto.preco) }}" required inputmode="decimal">
+          </div>
+          <div class="field">
+            <label for="foto">Nova foto</label>
+            <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+          </div>
+          {% if produto.foto %}
+            <div class="field">
+              <label>Foto atual</label>
+              <span class="current-photo">
+                <img src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}">
+              </span>
+            </div>
+          {% endif %}
+          <div class="actions">
+            <button class="primary-button" type="submit">Salvar</button>
+            <a class="secondary-button" href="{{ url_for('admin_produtos.listar_produtos') }}">Voltar</a>
+          </div>
+        </form>
+      </section>
+    </main>
   </body>
 </html>

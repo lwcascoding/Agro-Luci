@@ -2,73 +2,585 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
-    <title>Admin - Produtos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - Produtos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --blue: #1f6feb;
+        --blue-dark: #154a9a;
+        --yellow: #ffd54a;
+        --yellow-soft: #fff6bf;
+        --page: #f3f7ff;
+        --text: #1b1b1b;
+        --muted: #667085;
+        --line: #dbe4f0;
+        --card: #ffffff;
+        --shadow: 0 14px 34px rgba(21, 74, 154, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: Inter, sans-serif;
+        background: var(--page);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.96);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 8px 22px rgba(21, 74, 154, 0.04);
+        backdrop-filter: blur(14px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: min(1180px, calc(100% - 32px));
+        min-height: 74px;
+        margin: 0 auto;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+      }
+
+      .brand img {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 8px 18px rgba(21, 74, 154, 0.12);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #596579;
+        font-weight: 600;
+      }
+
+      .nav a {
+        padding: 10px 14px;
+        border-radius: 8px;
+        transition: background 160ms ease, color 160ms ease;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        color: var(--blue-dark);
+        background: var(--yellow-soft);
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 58px 0 72px;
+      }
+
+      .page-header {
+        margin-bottom: 34px;
+      }
+
+      .page-header h1 {
+        margin: 0 0 10px;
+        color: #102033;
+        font-size: clamp(2rem, 4vw, 2.7rem);
+        line-height: 1.05;
+      }
+
+      .page-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .flash-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 24px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .flash-list li {
+        padding: 14px 16px;
+        border: 1px solid #b8d4ff;
+        border-radius: 12px;
+        color: var(--blue-dark);
+        background: #eaf3ff;
+        font-weight: 700;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+        margin-bottom: 24px;
+      }
+
+      .dashboard-card {
+        border: 1px solid var(--line);
+        border-top: 6px solid var(--yellow);
+        border-radius: 12px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .stat-card {
+        min-height: 136px;
+        padding: 26px;
+      }
+
+      .stat-card span {
+        display: block;
+        margin-bottom: 22px;
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .stat-card strong {
+        color: var(--blue-dark);
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .summary-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+        padding: 26px 28px;
+      }
+
+      .summary-card h2,
+      .table-card h2,
+      .form-card h2 {
+        margin: 0 0 8px;
+        color: #102033;
+        font-size: 1.45rem;
+      }
+
+      .summary-card p,
+      .table-card > p,
+      .form-card > p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .soft-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid #e5cf68;
+        border-radius: 8px;
+        color: var(--blue-dark);
+        background: var(--yellow-soft);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .table-card {
+        margin-bottom: 30px;
+        padding: 28px;
+      }
+
+      .table-wrap {
+        margin-top: 28px;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 16px;
+        border-bottom: 1px solid #edf1f7;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th {
+        color: #1f2937;
+        font-size: 0.92rem;
+        font-weight: 800;
+      }
+
+      td {
+        color: #273142;
+        font-size: 0.95rem;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .thumb {
+        width: 58px;
+        height: 58px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        object-fit: contain;
+      }
+
+      .thumb-placeholder {
+        display: inline-grid;
+        width: 58px;
+        height: 58px;
+        place-items: center;
+        border: 1px dashed #b8c5d8;
+        border-radius: 10px;
+        color: #8a98ad;
+        background: #f8fbff;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .price {
+        font-weight: 800;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 14px;
+        border-radius: 999px;
+        color: #16723a;
+        background: #d8f8e3;
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .action-link,
+      .delete-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        font-weight: 800;
+      }
+
+      .action-link {
+        color: var(--blue-dark);
+        background: #eaf3ff;
+      }
+
+      .delete-button {
+        border: 0;
+        color: #b42318;
+        background: #fff0ee;
+        cursor: pointer;
+      }
+
+      .empty-state {
+        padding: 22px;
+        border: 1px dashed #b8c5d8;
+        border-radius: 12px;
+        color: var(--muted);
+        background: #f8fbff;
+        font-weight: 600;
+      }
+
+      .center-action {
+        display: flex;
+        justify-content: center;
+        margin: 28px 0;
+      }
+
+      .primary-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 52px;
+        padding: 0 24px;
+        border: 0;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 12px 22px rgba(31, 111, 235, 0.24);
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 160ms ease, transform 160ms ease;
+      }
+
+      .primary-button:hover {
+        background: var(--blue-dark);
+        transform: translateY(-1px);
+      }
+
+      .form-card {
+        padding: 28px;
+      }
+
+      .product-form {
+        display: grid;
+        gap: 20px;
+        margin-top: 24px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        color: #263142;
+        font-size: 0.94rem;
+        font-weight: 800;
+      }
+
+      input {
+        width: 100%;
+        min-height: 48px;
+        padding: 0 14px;
+        border: 1px solid #cfd8e6;
+        border-radius: 10px;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      input[type="file"] {
+        padding: 12px 14px;
+      }
+
+      input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+      }
+
+      @media (max-width: 860px) {
+        .topbar-inner,
+        .summary-card {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .nav {
+          width: 100%;
+          flex-wrap: wrap;
+        }
+
+        .stats-grid,
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .shell {
+          padding-top: 36px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .topbar-inner,
+        .shell {
+          width: min(100% - 22px, 1180px);
+        }
+
+        .nav a {
+          padding: 9px 10px;
+          font-size: 0.9rem;
+        }
+
+        .stat-card,
+        .summary-card,
+        .table-card,
+        .form-card {
+          padding: 20px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Produtos</h1>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="{{ url_for('admin_produtos.listar_produtos') }}" aria-label="AgroNotify dashboard">
+          <img src="{{ url_for('assets', filename='logo-agropecuaria-nossos-bichos.jpg') }}" alt="Agropecuária nossos bichos">
+        </a>
+        <nav class="nav" aria-label="Navegação do painel">
+          <a class="active" href="{{ url_for('admin_produtos.listar_produtos') }}">Dashboard</a>
+          <a href="#produtos-tabela">Produtos</a>
+          <a href="#novo-produto">Novo Produto</a>
+          <a href="/">Sair</a>
+        </nav>
+      </div>
+    </header>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <main class="shell">
+      <section class="page-header">
+        <h1>Dashboard</h1>
+        <p>Resumo geral do cadastrador de produtos.</p>
+      </section>
 
-    <h2>Cadastrar produto</h2>
-    <form action="{{ url_for('admin_produtos.cadastrar_produto') }}" method="post" enctype="multipart/form-data">
-      <p>
-        <label for="nome">Nome</label><br>
-        <input id="nome" name="nome" required>
-      </p>
-      <p>
-        <label for="preco">Preço</label><br>
-        <input id="preco" name="preco" required inputmode="decimal">
-      </p>
-      <p>
-        <label for="foto">Foto</label><br>
-        <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
-      </p>
-      <button type="submit">Cadastrar</button>
-    </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-list">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
-    <h2>Produtos cadastrados</h2>
-    {% if produtos %}
-      <table border="1" cellpadding="6">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Preço</th>
-            <th>Foto</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for produto in produtos %}
-            <tr>
-              <td>{{ produto.id }}</td>
-              <td>{{ produto.nome }}</td>
-              <td>{{ "%.2f"|format(produto.preco) }}</td>
-              <td>
-                {% if produto.foto %}
-                  <img src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}" width="80">
-                {% endif %}
-              </td>
-              <td>
-                <a href="{{ url_for('admin_produtos.editar_produto_form', produto_id=produto.id) }}">Editar</a>
-                <form action="{{ url_for('admin_produtos.excluir_produto', produto_id=produto.id) }}" method="post" style="display:inline">
-                  <button type="submit">Excluir</button>
-                </form>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>Nenhum produto cadastrado.</p>
-    {% endif %}
+      <section class="stats-grid" aria-label="Resumo de produtos">
+        <article class="dashboard-card stat-card">
+          <span>Total de produtos</span>
+          <strong>{{ produtos|length }}</strong>
+        </article>
+        <article class="dashboard-card stat-card">
+          <span>Produtos ativos</span>
+          <strong>{{ produtos|length }}</strong>
+        </article>
+        <article class="dashboard-card stat-card">
+          <span>Produtos excluídos</span>
+          <strong>0</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-card summary-card">
+        <div>
+          <h2>Produtos cadastrados</h2>
+          <p>Gerencie os produtos disponíveis na loja.</p>
+        </div>
+        <a class="soft-button" href="#produtos-tabela">Ver todos os produtos</a>
+      </section>
+
+      <section class="dashboard-card table-card" id="produtos-tabela">
+        <h2>Últimos produtos cadastrados</h2>
+        <p>Veja os produtos mais recentes adicionados à loja.</p>
+
+        {% if produtos %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Miniatura</th>
+                  <th>Produto</th>
+                  <th>Preço</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for produto in produtos %}
+                  <tr>
+                    <td>{{ produto.id }}</td>
+                    <td>
+                      {% if produto.foto %}
+                        <img class="thumb" src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}">
+                      {% else %}
+                        <span class="thumb-placeholder">Sem foto</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ produto.nome }}</td>
+                    <td class="price">R$ {{ ("%.2f"|format(produto.preco)).replace(".", ",") }}</td>
+                    <td><span class="status">Ativo</span></td>
+                    <td>
+                      <div class="actions">
+                        <a class="action-link" href="{{ url_for('admin_produtos.editar_produto_form', produto_id=produto.id) }}">Editar</a>
+                        <form action="{{ url_for('admin_produtos.excluir_produto', produto_id=produto.id) }}" method="post">
+                          <button class="delete-button" type="submit">Excluir</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="empty-state">Nenhum produto cadastrado.</p>
+        {% endif %}
+      </section>
+
+      <div class="center-action">
+        <a class="primary-button" href="#novo-produto">+ Cadastrar novo produto</a>
+      </div>
+
+      <section class="dashboard-card form-card" id="novo-produto">
+        <h2>Cadastrar produto</h2>
+        <p>Adicione um novo item para exibição na loja.</p>
+
+        <form class="product-form" action="{{ url_for('admin_produtos.cadastrar_produto') }}" method="post" enctype="multipart/form-data">
+          <div class="form-grid">
+            <div class="field">
+              <label for="nome">Nome</label>
+              <input id="nome" name="nome" required>
+            </div>
+            <div class="field">
+              <label for="preco">Preço</label>
+              <input id="preco" name="preco" required inputmode="decimal">
+            </div>
+            <div class="field full">
+              <label for="foto">Upload da imagem</label>
+              <input id="foto" name="foto" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+            </div>
+          </div>
+          <button class="primary-button" type="submit">Cadastrar produto</button>
+        </form>
+      </section>
+    </main>
   </body>
 </html>

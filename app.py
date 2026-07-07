@@ -1,8 +1,11 @@
 import os
 
-from flask import Flask
+from flask import Flask, jsonify, render_template_string, request, send_from_directory, url_for
 
-from admin_produtos import admin_produtos_bp, init_app as init_produtos_app
+from admin_produtos import admin_produtos_bp, get_db, init_app as init_produtos_app
+
+
+WHATSAPP_PHONE = "552433467354"
 
 
 def create_app(config=None):
@@ -17,6 +20,69 @@ def create_app(config=None):
 
     init_produtos_app(app)
     app.register_blueprint(admin_produtos_bp)
+
+    @app.after_request
+    def allow_local_product_api(response):
+        if request.path == "/api/produtos":
+            response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    @app.template_filter("brl")
+    def format_brl(value):
+        return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+    @app.get("/")
+    def index():
+        produtos = get_db().execute(
+            "SELECT id, nome, preco, foto FROM produtos ORDER BY id DESC"
+        ).fetchall()
+
+        with open(os.path.join(app.root_path, "index.html"), encoding="utf-8") as file:
+            template = file.read()
+
+        return render_template_string(
+            template,
+            produtos=produtos,
+            whatsapp_phone=WHATSAPP_PHONE,
+        )
+
+    @app.get("/api/produtos")
+    def api_produtos():
+        produtos = get_db().execute(
+            "SELECT id, nome, preco, foto FROM produtos ORDER BY id DESC"
+        ).fetchall()
+
+        return jsonify(
+            [
+                {
+                    "id": produto["id"],
+                    "nome": produto["nome"],
+                    "preco": produto["preco"],
+                    "preco_formatado": format_brl(produto["preco"]),
+                    "foto_url": url_for(
+                        "static",
+                        filename=produto["foto"].replace("static/", "", 1),
+                    )
+                    if produto["foto"]
+                    else url_for("assets", filename="logo-agropecuaria-nossos-bichos.jpg"),
+                }
+                for produto in produtos
+            ]
+        )
+
+    @app.get("/assets/<path:filename>")
+    def assets(filename):
+        return send_from_directory(os.path.join(app.root_path, "assets"), filename)
+
+    @app.get("/fonts/<path:filename>")
+    def fonts(filename):
+        return send_from_directory(os.path.join(app.root_path, "fonts"), filename)
+
+    @app.get("/<path:filename>")
+    def root_files(filename):
+        if filename in {"styles.css", "script.js"}:
+            return send_from_directory(app.root_path, filename)
+        return ("Not found", 404)
 
     return app
 
