@@ -9,3 +9,5 @@ agro_luci.db
 static/uploads/produtos/*
 !static/uploads/produtos/.gitkeep
 .vercel
+
+.vercel

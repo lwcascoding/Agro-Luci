@@ -15,9 +15,15 @@ WHATSAPP_PHONE = "5524999380461"
 
 def create_app(config=None):
     app = Flask(__name__)
+    is_vercel = bool(os.environ.get("VERCEL"))
+    default_database = "/tmp/agro_luci.db" if is_vercel else "agro_luci.db"
+    default_upload_folder = (
+        "/tmp/uploads/produtos" if is_vercel else "static/uploads/produtos"
+    )
+
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-admin-secret")
-    app.config["DATABASE"] = os.environ.get("DATABASE_PATH", "agro_luci.db")
-    app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", "static/uploads/produtos")
+    app.config["DATABASE"] = os.environ.get("DATABASE_PATH", default_database)
+    app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", default_upload_folder)
     app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
     if config:
