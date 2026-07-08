@@ -20,8 +20,32 @@ admin_produtos_bp = Blueprint("admin_produtos", __name__)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
 
+def get_database_path():
+    database = current_app.config["DATABASE"]
+    if os.path.isabs(database):
+        return database
+    return os.path.join(current_app.root_path, database)
+
+
+def get_upload_folder():
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    if os.path.isabs(upload_folder):
+        return upload_folder
+    return os.path.join(current_app.root_path, upload_folder)
+
+
 def init_app(app):
-    os.makedirs(os.path.join(app.root_path, app.config["UPLOAD_FOLDER"]), exist_ok=True)
+    upload_folder = app.config["UPLOAD_FOLDER"]
+    if not os.path.isabs(upload_folder):
+        upload_folder = os.path.join(app.root_path, upload_folder)
+    os.makedirs(upload_folder, exist_ok=True)
+
+    database = app.config["DATABASE"]
+    if not os.path.isabs(database):
+        database = os.path.join(app.root_path, database)
+    database_folder = os.path.dirname(database)
+    if database_folder:
+        os.makedirs(database_folder, exist_ok=True)
 
     with app.app_context():
         init_db()
@@ -31,9 +55,7 @@ def init_app(app):
 
 def get_db():
     if "db" not in g:
-        g.db = sqlite3.connect(
-            os.path.join(current_app.root_path, current_app.config["DATABASE"])
-        )
+        g.db = sqlite3.connect(get_database_path())
         g.db.row_factory = sqlite3.Row
 
     return g.db
@@ -95,24 +117,34 @@ def save_uploaded_photo(file_storage):
     name, extension = os.path.splitext(filename)
     filename = f"{name}_{os.urandom(8).hex()}{extension.lower()}"
 
-    upload_folder = os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
+    upload_folder = get_upload_folder()
     os.makedirs(upload_folder, exist_ok=True)
     file_storage.save(os.path.join(upload_folder, filename))
 
-    return f"{current_app.config['UPLOAD_FOLDER']}/{filename}"
+    return f"uploads/produtos/{filename}"
 
 
 def delete_photo(photo_path):
     if not photo_path:
         return
 
-    full_path = os.path.abspath(os.path.join(current_app.root_path, photo_path))
-    upload_folder = os.path.abspath(
-        os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
+    normalized = photo_path.replace("\\", "/")
+    if os.path.isabs(photo_path):
+        full_path = os.path.abspath(photo_path)
+    elif normalized.startswith("static/"):
+        full_path = os.path.abspath(os.path.join(current_app.root_path, normalized))
+    else:
+        full_path = os.path.abspath(os.path.join(get_upload_folder(), os.path.basename(normalized)))
+
+    upload_folder = os.path.abspath(get_upload_folder())
+    legacy_upload_folder = os.path.abspath(
+        os.path.join(current_app.root_path, "static/uploads/produtos")
     )
 
-    if os.path.commonpath([full_path, upload_folder]) == upload_folder and os.path.exists(
-        full_path
+    allowed_folders = (upload_folder, legacy_upload_folder)
+    if (
+        any(os.path.commonpath([full_path, folder]) == folder for folder in allowed_folders)
+        and os.path.exists(full_path)
     ):
         os.remove(full_path)
 
@@ -131,7 +163,7 @@ def get_produto_or_404(produto_id):
     return produto
 
 
-@admin_produtos_bp.get("/admin-agronossosbichos")
+@admin_produtos_bp.get("/admin-agroluci")
 def listar_produtos():
     produtos = get_db().execute(
         "SELECT id, nome, preco, foto FROM produtos ORDER BY id DESC"
@@ -139,7 +171,7 @@ def listar_produtos():
     return render_template("admin_produtos/lista.html", produtos=produtos)
 
 
-@admin_produtos_bp.post("/admin-agronossosbichos/produtos")
+@admin_produtos_bp.post("/admin-agroluci/produtos")
 def cadastrar_produto():
     nome = request.form.get("nome", "").strip()
 
@@ -165,13 +197,13 @@ def cadastrar_produto():
     return redirect(url_for("admin_produtos.listar_produtos"))
 
 
-@admin_produtos_bp.get("/admin-agronossosbichos/produtos/<int:produto_id>/editar")
+@admin_produtos_bp.get("/admin-agroluci/produtos/<int:produto_id>/editar")
 def editar_produto_form(produto_id):
     produto = get_produto_or_404(produto_id)
     return render_template("admin_produtos/editar.html", produto=produto)
 
 
-@admin_produtos_bp.post("/admin-agronossosbichos/produtos/<int:produto_id>/editar")
+@admin_produtos_bp.post("/admin-agroluci/produtos/<int:produto_id>/editar")
 def editar_produto(produto_id):
     produto = get_produto_or_404(produto_id)
     nome = request.form.get("nome", "").strip()
@@ -203,7 +235,7 @@ def editar_produto(produto_id):
     return redirect(url_for("admin_produtos.listar_produtos"))
 
 
-@admin_produtos_bp.post("/admin-agronossosbichos/produtos/<int:produto_id>/excluir")
+@admin_produtos_bp.post("/admin-agroluci/produtos/<int:produto_id>/excluir")
 def excluir_produto(produto_id):
     produto = get_produto_or_404(produto_id)
 

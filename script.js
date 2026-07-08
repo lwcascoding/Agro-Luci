@@ -14,7 +14,7 @@ const siteHeader = document.querySelector(".site-header");
 const heroVisual = document.querySelector(".hero-visual");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const isMobileViewport = window.matchMedia("(max-width: 760px)");
-const WHATSAPP_PHONE = "552433467354";
+const WHATSAPP_PHONE = "5524999380461";
 
 const productSlides = [
   {
@@ -52,15 +52,32 @@ const productSlides = [
 ];
 
 let activeProductSlide = 0;
+let scrollTicking = false;
 
 document.body.classList.add("page-ready");
 
-window.addEventListener("scroll", () => {
+function updateScrollEffects() {
   siteHeader.classList.toggle("scrolled", window.scrollY > 24);
   if (!isMobileViewport.matches && !prefersReducedMotion.matches) {
     document.documentElement.style.setProperty("--scroll-shift", `${Math.min(window.scrollY * 0.04, 18)}px`);
   }
-});
+  scrollTicking = false;
+}
+
+window.addEventListener(
+  "scroll",
+  () => {
+    if (scrollTicking) {
+      return;
+    }
+
+    scrollTicking = true;
+    window.requestAnimationFrame(updateScrollEffects);
+  },
+  { passive: true }
+);
+
+updateScrollEffects();
 
 if (heroVisual && !isMobileViewport.matches && !prefersReducedMotion.matches) {
   heroVisual.addEventListener("pointermove", (event) => {
@@ -166,7 +183,7 @@ function createProductCard(product) {
   buyButton.href = getWhatsappBuyLink(product);
   buyButton.target = "_blank";
   buyButton.rel = "noreferrer";
-  buyButton.innerHTML = '<img src="assets/whatsapp-icon.png" alt="" />Comprar';
+  buyButton.innerHTML = '<img src="assets/whatsapp-icon.webp" alt="" width="25" height="25" decoding="async" />Comprar';
 
   info.append(title, price, buyButton);
   article.append(photoWrap, info);
@@ -192,20 +209,13 @@ function renderDynamicProducts(products) {
   }
 }
 function fetchProducts() {
-  return fetch("/api/produtos")
-    .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-    .catch(() =>
-      fetch("http://127.0.0.1:5000/api/produtos").then((response) =>
-        response.ok ? response.json() : Promise.reject(response)
-      )
-    )
-    .catch(() =>
-      fetch("http://127.0.0.1:5001/api/produtos").then((response) =>
-        response.ok ? response.json() : Promise.reject(response)
-      )
-    );
+  return fetch("/api/produtos").then((response) =>
+    response.ok ? response.json() : Promise.reject(response)
+  );
 }
 
-fetchProducts()
-  .then(renderDynamicProducts)
-  .catch(() => {});
+if (!document.querySelector("[data-products-grid] .store-product-card")) {
+  fetchProducts()
+    .then(renderDynamicProducts)
+    .catch(() => {});
+}

@@ -9,16 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
       :root {
-        --blue: #1f6feb;
-        --blue-dark: #154a9a;
-        --yellow: #ffd54a;
-        --yellow-soft: #fff6bf;
-        --page: #f3f7ff;
-        --text: #1b1b1b;
-        --muted: #667085;
-        --line: #dbe4f0;
+        --blue: #3f5227;
+        --blue-dark: #2f3d1e;
+        --yellow: #a47928;
+        --yellow-soft: #f2ead9;
+        --page: #fffaf5;
+        --text: #27311e;
+        --muted: #6e654f;
+        --line: #ded6c7;
         --card: #ffffff;
-        --shadow: 0 14px 34px rgba(21, 74, 154, 0.08);
+        --shadow: 0 14px 34px rgba(63, 82, 39, 0.1);
       }
 
       * {
@@ -52,7 +52,7 @@
         z-index: 10;
         background: rgba(255, 255, 255, 0.96);
         border-bottom: 1px solid var(--line);
-        box-shadow: 0 8px 22px rgba(21, 74, 154, 0.04);
+        box-shadow: 0 8px 22px rgba(63, 82, 39, 0.06);
         backdrop-filter: blur(14px);
       }
 
@@ -78,7 +78,7 @@
         height: 52px;
         border-radius: 12px;
         object-fit: cover;
-        box-shadow: 0 8px 18px rgba(21, 74, 154, 0.12);
+        box-shadow: 0 8px 18px rgba(63, 82, 39, 0.16);
       }
 
       .nav {
@@ -134,10 +134,10 @@
 
       .flash-list li {
         padding: 14px 16px;
-        border: 1px solid #b8d4ff;
+        border: 1px solid #d5c39b;
         border-radius: 12px;
         color: var(--blue-dark);
-        background: #eaf3ff;
+        background: #f7f1e4;
         font-weight: 700;
       }
 
@@ -206,7 +206,7 @@
         justify-content: center;
         min-height: 42px;
         padding: 0 16px;
-        border: 1px solid #e5cf68;
+        border: 1px solid #d5c39b;
         border-radius: 8px;
         color: var(--blue-dark);
         background: var(--yellow-soft);
@@ -347,7 +347,7 @@
         border-radius: 8px;
         color: #fff;
         background: var(--blue);
-        box-shadow: 0 12px 22px rgba(31, 111, 235, 0.24);
+        box-shadow: 0 12px 22px rgba(63, 82, 39, 0.24);
         font-weight: 800;
         cursor: pointer;
         transition: background 160ms ease, transform 160ms ease;
@@ -407,7 +407,7 @@
 
       input:focus {
         border-color: var(--blue);
-        box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+        box-shadow: 0 0 0 4px rgba(63, 82, 39, 0.12);
       }
 
       @media (max-width: 860px) {
@@ -455,8 +455,8 @@
   <body>
     <header class="topbar">
       <div class="topbar-inner">
-        <a class="brand" href="{{ url_for('admin_produtos.listar_produtos') }}" aria-label="AgroNotify dashboard">
-          <img src="{{ url_for('assets', filename='logo-agropecuaria-nossos-bichos.jpg') }}" alt="Agropecuária nossos bichos">
+        <a class="brand" href="{{ url_for('admin_produtos.listar_produtos') }}" aria-label="Dashboard Agro Luci">
+          <img src="{{ url_for('assets', filename='logo-agro-luci.jpeg') }}" alt="Agro Luci">
         </a>
         <nav class="nav" aria-label="Navegação do painel">
           <a class="active" href="{{ url_for('admin_produtos.listar_produtos') }}">Dashboard</a>
@@ -529,7 +529,7 @@
                     <td>{{ produto.id }}</td>
                     <td>
                       {% if produto.foto %}
-                        <img class="thumb" src="{{ url_for('static', filename=produto.foto.replace('static/', '', 1)) }}" alt="{{ produto.nome }}">
+                        <img class="thumb" src="{{ product_photo_url(produto.foto) }}" alt="{{ produto.nome }}">
                       {% else %}
                         <span class="thumb-placeholder">Sem foto</span>
                       {% endif %}

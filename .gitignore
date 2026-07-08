@@ -1,8 +1,11 @@
 __pycache__/
 *.pyc
-agro_nossos_bichos.db
+agro_luci.db
+.flask-server*.err
+.flask-server*.log
+.cloudflared-tunnel.*
+.localtunnel.*
+.tools/
 static/uploads/produtos/*
 !static/uploads/produtos/.gitkeep
-.vercel
-
 .vercel

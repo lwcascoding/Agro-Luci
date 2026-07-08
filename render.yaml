@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: agro-luci
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.4
+      - key: DATABASE_PATH
+        value: /var/data/agro_luci.db
+      - key: UPLOAD_FOLDER
+        value: /var/data/uploads/produtos
+      - key: SECRET_KEY
+        generateValue: true
+    disk:
+      name: agro-luci-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -2,17 +2,22 @@ import os
 
 from flask import Flask, jsonify, render_template_string, request, send_from_directory, url_for
 
-from admin_produtos import admin_produtos_bp, get_db, init_app as init_produtos_app
+from admin_produtos import (
+    admin_produtos_bp,
+    get_db,
+    get_upload_folder,
+    init_app as init_produtos_app,
+)
 
 
-WHATSAPP_PHONE = "552433467354"
+WHATSAPP_PHONE = "5524999380461"
 
 
 def create_app(config=None):
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-admin-secret")
-    app.config["DATABASE"] = "agro_nossos_bichos.db"
-    app.config["UPLOAD_FOLDER"] = "static/uploads/produtos"
+    app.config["DATABASE"] = os.environ.get("DATABASE_PATH", "agro_luci.db")
+    app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", "static/uploads/produtos")
     app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
     if config:
@@ -30,6 +35,17 @@ def create_app(config=None):
     @app.template_filter("brl")
     def format_brl(value):
         return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+    @app.template_global()
+    def product_photo_url(photo):
+        if not photo:
+            return url_for("assets", filename="logo-agro-luci.jpeg")
+
+        normalized = photo.replace("\\", "/")
+        if normalized.startswith("static/"):
+            return url_for("static", filename=normalized.replace("static/", "", 1))
+
+        return url_for("uploaded_product_photo", filename=os.path.basename(normalized))
 
     @app.get("/")
     def index():
@@ -59,16 +75,15 @@ def create_app(config=None):
                     "nome": produto["nome"],
                     "preco": produto["preco"],
                     "preco_formatado": format_brl(produto["preco"]),
-                    "foto_url": url_for(
-                        "static",
-                        filename=produto["foto"].replace("static/", "", 1),
-                    )
-                    if produto["foto"]
-                    else url_for("assets", filename="logo-agropecuaria-nossos-bichos.jpg"),
+                    "foto_url": product_photo_url(produto["foto"]),
                 }
                 for produto in produtos
             ]
         )
+
+    @app.get("/uploads/produtos/<path:filename>")
+    def uploaded_product_photo(filename):
+        return send_from_directory(get_upload_folder(), filename)
 
     @app.get("/assets/<path:filename>")
     def assets(filename):
