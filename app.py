@@ -4,9 +4,9 @@ from flask import Flask, jsonify, render_template_string, request, send_from_dir
 
 from admin_produtos import (
     admin_produtos_bp,
-    get_db,
     get_upload_folder,
     init_app as init_produtos_app,
+    list_products,
 )
 
 
@@ -48,6 +48,9 @@ def create_app(config=None):
             return url_for("assets", filename="logo-agro-luci.jpeg")
 
         normalized = photo.replace("\\", "/")
+        if normalized.startswith(("http://", "https://")):
+            return normalized
+
         if normalized.startswith("static/"):
             return url_for("static", filename=normalized.replace("static/", "", 1))
 
@@ -55,9 +58,7 @@ def create_app(config=None):
 
     @app.get("/")
     def index():
-        produtos = get_db().execute(
-            "SELECT id, nome, preco, foto FROM produtos ORDER BY id DESC"
-        ).fetchall()
+        produtos = list_products()
 
         with open(os.path.join(app.root_path, "index.html"), encoding="utf-8") as file:
             template = file.read()
@@ -70,9 +71,7 @@ def create_app(config=None):
 
     @app.get("/api/produtos")
     def api_produtos():
-        produtos = get_db().execute(
-            "SELECT id, nome, preco, foto FROM produtos ORDER BY id DESC"
-        ).fetchall()
+        produtos = list_products()
 
         return jsonify(
             [
